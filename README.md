@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # itcast_tao
 
 ## Project setup
@@ -27,3 +28,7 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+=======
+# vue-manage
+vue项目
+>>>>>>> 097990215a4750da7ebc310a933e6eb36256d576
