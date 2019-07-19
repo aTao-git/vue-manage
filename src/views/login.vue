@@ -4,13 +4,13 @@
       <img alt class="avatar" src="../assets/avatar.jpg" />
       <el-form :model="loginForm" :rules="rules" class="demo-ruleForm" ref="loginForm">
         <el-form-item prop="username">
-          <el-input placeholder="用户名" v-model="loginForm.username"></el-input>
+          <el-input placeholder="用户名" v-model="loginForm.username" v-firstfocus prefix-icon="icon-user-tie"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input placeholder="请输入密码" v-model="loginForm.password"></el-input>
+          <el-input placeholder="请输入密码" v-model="loginForm.password" @keyup.native.enter="login" prefix-icon="icon-lock"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button class="login-btn">
+          <el-button class="login-btn" @click="login">
             <span class="icon-tongue2 change"></span>
           </el-button>
         </el-form-item>
@@ -19,6 +19,8 @@
   </div>
 </template>
 <script>
+import { login } from '@/api/axios_login.js'
+import { firstfocus } from '@/untils/directives.js'
 export default {
   data () {
     return {
@@ -33,6 +35,44 @@ export default {
         password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
       }
     }
+  },
+  methods: {
+    login () {
+      this.$refs.loginForm.validate((valid) => {
+        if (valid) {
+          login(this.loginForm)
+            .then(res => {
+              if (res.data.meta.status === 200) {
+                this.$router.push({ name: 'home' })
+              } else {
+                this.$message({
+                  showClose: true,
+                  message: res.data.meta.msg,
+                  type: 'error'
+                })
+              }
+            })
+            .catch(err => {
+              console.log(err)
+              this.$message({
+                showClose: true,
+                message: '登陆失败',
+                type: 'error'
+              })
+            })
+        } else {
+          this.$message({
+            showClose: true,
+            message: '账号密码不合法',
+            type: 'error'
+          })
+          return false
+        }
+      })
+    }
+  },
+  directives: {
+    firstfocus
   }
 }
 </script>
