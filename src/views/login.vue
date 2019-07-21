@@ -43,6 +43,7 @@ export default {
           login(this.loginForm)
             .then(res => {
               if (res.data.meta.status === 200) {
+                localStorage.setItem('itcast_manage_tao', res.data.data.token)
                 this.$router.push({ name: 'home' })
               } else {
                 this.$message({
