@@ -223,6 +223,7 @@ export default {
       this.starUserDialog = true
       this.starform.username = row.username
       this.starform.id = row.id
+      this.starform.value = row.rid
       let res = await getRoles()
       if (res.data.meta.status === 200) {
         this.roles = res.data.data

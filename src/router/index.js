@@ -4,6 +4,8 @@ import Login from '@/views/login.vue'
 import Home from '@/views/home.vue'
 import Welcome from '@/views/welcome.vue'
 import UserCtrl from '@/views/users/userCtrl.vue'
+import Rightlist from '@/views/rights/rightlist.vue'
+import Rightset from '@/views/rights/rightset.vue'
 Vue.use(VueRouter)
 export default new VueRouter({
   routes: [
@@ -30,6 +32,14 @@ export default new VueRouter({
         name: 'userCtrl',
         path: 'userCtrl',
         component: UserCtrl
+      }, {
+        name: 'rightlist',
+        path: 'rightlist',
+        component: Rightlist
+      }, {
+        name: 'rightset',
+        path: 'rightset',
+        component: Rightset
       }]
     }
   ]

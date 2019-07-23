@@ -17,11 +17,15 @@
           <el-submenu index="2">
             <template slot="title">
               <i class="el-icon-cherry"></i>
-              <span>导航一</span>
+              <span>权限管理</span>
             </template>
-            <el-menu-item index="2-3">
+            <el-menu-item index="/home/rightset">
               <i class="el-icon-link"></i>
-              <span>导航一</span>
+              <span>角色列表</span>
+            </el-menu-item>
+            <el-menu-item index="/home/rightlist">
+              <i class="el-icon-link"></i>
+              <span>权限列表</span>
             </el-menu-item>
           </el-submenu>
         </el-menu>
