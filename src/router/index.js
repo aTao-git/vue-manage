@@ -30,15 +30,15 @@ export default new VueRouter({
         component: Welcome
       }, {
         name: 'userCtrl',
-        path: 'userCtrl',
+        path: 'users',
         component: UserCtrl
       }, {
         name: 'rightlist',
-        path: 'rightlist',
+        path: 'rights',
         component: Rightlist
       }, {
         name: 'rightset',
-        path: 'rightset',
+        path: 'roles',
         component: Rightset
       }]
     }

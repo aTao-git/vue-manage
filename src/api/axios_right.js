@@ -10,3 +10,17 @@ export const delUserRight = (roleId, rightId) => {
     method: 'delete'
   })
 }
+export const addRole = (roleId, rids) => {
+  return axios({
+    url: `roles/${roleId}/rights`,
+    method: 'post',
+    data: { rids }
+  })
+}
+export const addRoleSubmit = (data) => {
+  return axios({
+    url: 'roles',
+    method: 'post',
+    data
+  })
+}

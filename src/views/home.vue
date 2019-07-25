@@ -4,28 +4,14 @@
       <el-aside width="auto">
         <div class="logo"></div>
         <el-menu :unique-opened='true' :collapse="iscollapse" :router="true" class="el-menu-vertical-demo" default-active="2">
-          <el-submenu index="1">
+          <el-submenu :index="one.id+''" v-for="one in leftList" :key="one.id">
             <template slot="title">
               <i class="el-icon-watermelon"></i>
-              <span>用户列表</span>
+              <span>{{one.authName}}</span>
             </template>
-            <el-menu-item index="/home/userCtrl">
+            <el-menu-item :index="'/home/'+two.path" v-for="two in one.children" :key="two.id">
               <i class="el-icon-link"></i>
-              <span>用户管理</span>
-            </el-menu-item>
-          </el-submenu>
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-cherry"></i>
-              <span>权限管理</span>
-            </template>
-            <el-menu-item index="/home/rightset">
-              <i class="el-icon-link"></i>
-              <span>角色列表</span>
-            </el-menu-item>
-            <el-menu-item index="/home/rightlist">
-              <i class="el-icon-link"></i>
-              <span>权限列表</span>
+              <span>{{two.authName}}</span>
             </el-menu-item>
           </el-submenu>
         </el-menu>
@@ -44,11 +30,25 @@
   </div>
 </template>
 <script>
+import { getLeftList } from '@/api/axios_userCtrl.js'
 export default {
   data () {
     return {
-      iscollapse: false
+      iscollapse: false,
+      leftList: []
     }
+  },
+  mounted () {
+    getLeftList()
+      .then(res => {
+        if (res.data.meta.status === 200) {
+          this.leftList = res.data.data
+          console.log(res)
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
 </script>

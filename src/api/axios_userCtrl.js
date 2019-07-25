@@ -43,3 +43,8 @@ export const setRoles = (data) => {
     data: { rid: data.value }
   })
 }
+export const getLeftList = () => {
+  return axios({
+    url: 'menus'
+  })
+}
