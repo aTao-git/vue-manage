@@ -43,7 +43,6 @@ export default {
       .then(res => {
         if (res.data.meta.status === 200) {
           this.leftList = res.data.data
-          console.log(res)
         }
       })
       .catch(err => {
