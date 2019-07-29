@@ -17,9 +17,11 @@
     </el-steps>
     <!-- 步骤条部分结束 -->
     <!-- 左标签页部分开始 -->
-    <el-form :rules="rules" ref="addForm" :model="addform">
+    <el-form :model="addform" :rules="rules" ref="addForm">
       <el-tabs
+        :before-leave="beforeLeaveTab"
         :tab-position="'left'"
+        @tab-click="handleClick"
         style="height: 200px;margin-top:30px;height: 100%"
         v-model="active"
       >
@@ -36,7 +38,7 @@
           <el-form-item label="商品数量" prop="goods_number">
             <el-input v-model="addform.goods_number"></el-input>
           </el-form-item>
-          <el-form-item label="商品分类">
+          <el-form-item label="商品分类" prop="goods_cat">
             <el-cascader
               :options="goods_categories"
               :props="goodsprop"
@@ -45,8 +47,22 @@
             ></el-cascader>
           </el-form-item>
         </el-tab-pane>
-        <el-tab-pane label="商品参数" name="1">配置管理</el-tab-pane>
-        <el-tab-pane label="商品属性" name="2">配置管理</el-tab-pane>
+        <el-tab-pane label="商品参数" name="1">
+          <el-form :label-position="'right'" label-width="80px">
+            <el-form-item :label="first.attr_name" v-for="first in goods_params" :key="first.attr_id">
+            <el-checkbox-group style="display: inline-block;margin-right: 10px" v-for="(two,index) in first.attr_vals" v-model="first.attr_vals" :key="index">
+              <el-checkbox :label="two" border></el-checkbox>
+            </el-checkbox-group>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="商品属性" name="2">
+          <el-form :label-position="'right'" label-width="130px">
+            <el-form-item :label="first.attr_name" v-for="first in attribute" :key="first.attr_id">
+              <el-input :value="first.attr_vals"></el-input>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
         <el-tab-pane label="商品图片" name="3">
           <el-upload
             :file-list="fileList"
@@ -54,6 +70,7 @@
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :on-success="handleSuccess"
+            :before-upload="handleBefore"
             action="http://localhost:8888/api/private/v1/upload"
             class="upload-demo"
             list-type="picture"
@@ -62,29 +79,39 @@
             <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
           </el-upload>
         </el-tab-pane>
-        <el-tab-pane label="商品内容" name="4">定时任务补偿</el-tab-pane>
+        <el-tab-pane label="商品内容" name="4">
+          <quillEditor v-model="addform.goods_introduce"></quillEditor>
+        </el-tab-pane>
       </el-tabs>
-      <el-button style="margin-left: 250px;width:200px" type="primary" round @click="next">下一步</el-button>
-      <el-button style="margin-left: 350px;width:200px" type="primary" round @click="submitGoods">提交</el-button>
+      <el-button @click="submitGoods" round style="margin-left: 500px;width:200px" type="primary">提交</el-button>
     </el-form>
     <!-- 左标签页部分结束 -->
   </div>
 </template>
 <script>
-import { getCategories, addGoods } from '@/api/axios_goods.js'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+import { quillEditor } from 'vue-quill-editor'
+import { getCategories, addGoods, getAllParameter } from '@/api/axios_goods.js'
+import myemit from '@/untils/event.js'
 export default {
   data () {
     return {
       active: '0',
       fileList: [],
       goods_categories: [],
+      goods_params: [],
+      attribute: [],
       addform: {
         goods_name: '',
         goods_price: '',
         goods_weight: '',
         goods_number: '',
         goods_cat: '',
-        pics: []
+        pics: [],
+        attrs: [],
+        goods_introduce: ''
       },
       goodsprop: {
         expandTrigger: 'hover',
@@ -104,12 +131,29 @@ export default {
         ],
         goods_number: [
           { required: true, message: '请输入用户名', trigger: 'blur' }
-        ]
+        ],
+        goods_cat: [{ required: true, message: '必须选择分类' }]
       }
     }
   },
   methods: {
+    async handleClick () {
+      if (this.active === '1') {
+        let res = await getAllParameter(this.addform.goods_cat[this.addform.goods_cat.length - 1], 'many')
+        res.data.data.forEach(item => {
+          let temp = item.attr_vals.split(',')
+          item.attr_vals = temp
+        })
+        this.goods_params = res.data.data
+      } else if (this.active === '2') {
+        let res = await getAllParameter(this.addform.goods_cat[this.addform.goods_cat.length - 1], 'only')
+        this.attribute = res.data.data
+      }
+    },
     handleRemove (file, fileList) {
+      if (!file.response) {
+        return
+      }
       var current = file.response.data.tmp_path
       for (var i = 0; i < this.addform.pics.length; i++) {
         if (this.addform.pics[i].pic === current) {
@@ -117,6 +161,17 @@ export default {
           break
         }
       }
+    },
+    handleBefore (file) {
+      if (file.type.indexOf('image/') !== 0) {
+        this.$message.error('请选择图片')
+        return false
+      }
+    },
+    beforeLeaveTab () {
+      return this.$refs.addForm.validate(valid => {
+        if (!valid) throw new Error('取消成功！')
+      })
     },
     handlePreview (file) {
       console.log(file)
@@ -126,16 +181,18 @@ export default {
         this.addform.pics.push({ pic: res.data.tmp_path })
       }
     },
-    next () {
-      var number = Number(this.active)
-      number++
-      this.active = number.toString()
-    },
     submitGoods () {
       this.$refs.addForm.validate(valid => {
         if (valid) {
           this.addform.pics = this.addform.pics[0]
           this.addform.goods_cat = this.addform.goods_cat.join(',')
+          this.goods_params.forEach(item => {
+            let id = item.attr_id
+            item.attr_vals.forEach(item2 => {
+              this.addform.attrs.push({ attr_id: id, attr_value: item2 })
+            })
+          })
+          console.log(this.addform)
           addGoods(this.addform)
             .then(res => {
               console.log(res)
@@ -174,6 +231,13 @@ export default {
       .catch(err => {
         console.log(err)
       })
+    console.log(this.$route)
+    myemit.$on('sendid', (data) => {
+      console.log(data)
+    })
+  },
+  components: {
+    quillEditor
   }
 }
 </script>

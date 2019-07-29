@@ -18,3 +18,9 @@ export const addGoods = (data) => {
     data
   })
 }
+export const getAllParameter = (id, type) => {
+  return axios({
+    url: `categories/${id}/attributes`,
+    params: { sel: type }
+  })
+}

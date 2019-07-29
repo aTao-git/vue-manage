@@ -32,9 +32,9 @@
         <template slot-scope="scope">{{scope.row.upd_time | timeFilter}}</template>
       </el-table-column>
       <el-table-column label="操作" width="180">
-        <template>
+        <template slot-scope="scope">
           <el-tooltip class="item" content="编辑" effect="dark" placement="bottom-start">
-            <el-button circle icon="el-icon-edit" type="primary"></el-button>
+            <el-button @click="editGoods(scope.row)" circle icon="el-icon-edit" type="primary"></el-button>
           </el-tooltip>
           <el-tooltip class="item" content="分配" effect="dark" placement="bottom-start">
             <el-button circle icon="el-icon-star-off" type="warning"></el-button>
@@ -60,6 +60,7 @@
   </div>
 </template>
 <script>
+import myemit from '@/untils/event.js'
 import { getAllGoodsList } from '@/api/axios_goods.js'
 export default {
   data () {
@@ -94,6 +95,11 @@ export default {
         .catch(err => {
           console.log(err)
         })
+    },
+    editGoods (row) {
+      console.log(row.goods_id)
+      this.$router.push({ name: 'addGood', params: { id: row.goods_id } })
+      myemit.$emit('sendid', row)
     }
   },
   mounted () {

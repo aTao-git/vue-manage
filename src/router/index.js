@@ -9,6 +9,7 @@ import Rightset from '@/views/rights/rightset.vue'
 import Goods from '@/views/goods/goods.vue'
 import GoodsList from '@/views/goods/goodsList.vue'
 import AddGood from '@/views/goods/addGood.vue'
+import Reports from '@/views/reports.vue'
 Vue.use(VueRouter)
 export default new VueRouter({
   routes: [
@@ -56,10 +57,14 @@ export default new VueRouter({
           },
           {
             name: 'addGood',
-            path: 'addGood',
+            path: 'addGood/:id',
             component: AddGood
           }
         ]
+      }, {
+        name: 'reports',
+        path: 'reports',
+        component: Reports
       }]
     }
   ]
